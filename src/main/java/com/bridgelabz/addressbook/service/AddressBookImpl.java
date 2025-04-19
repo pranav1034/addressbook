@@ -2,6 +2,7 @@ package com.bridgelabz.addressbook.service;
 
 import com.bridgelabz.addressbook.dto.AddressBookDTO;
 import com.bridgelabz.addressbook.dto.ResponseDTO;
+import com.bridgelabz.addressbook.exception.AddressBookMissingException;
 import com.bridgelabz.addressbook.model.AddressBook;
 import com.bridgelabz.addressbook.repository.AddressBookRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +34,7 @@ public class AddressBookImpl implements AddressBookService{
     }
 
     public ResponseEntity<ResponseDTO> getDetailsById(Long id){
-        AddressBook addressBook = repository.findById(id).orElse(null);
-        if(addressBook == null) {
-            ResponseDTO response = new ResponseDTO("Details not found", null);
-            log.error("Address book details with ID " + id + " not found");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
+        AddressBook addressBook = repository.findById(id).orElseThrow(()-> new AddressBookMissingException("ID not found: "+id));
         ResponseDTO response = new ResponseDTO("Details found", addressBook);
         log.info("Address book details with ID " + id + " found");
         return new ResponseEntity<>(response, HttpStatus.OK);
